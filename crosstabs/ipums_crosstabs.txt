@@ -1,0 +1,49 @@
+* IPUMS USA ED crosstabs 
+use /pkg/ipums/misc/census-das/das_dp_data/stata/ipums_usa_orig.dta
+
+* push gq, statefip, county, enumdist down to person records
+foreach hh in gq statefip county enumdist {
+	replace `hh' = `hh'[_n-1] if `hh'==.
+	}
+
+* generate categorical variables	
+generate qage = 0
+replace qage = 17 if age < 18
+replace qage = 18 if qage == 0
+
+generate cenhisp = 0
+replace cenhisp = 1 if hispan > 0
+
+generate cenrace = race
+
+* geography variables
+generate st=statefip
+	tostring st, format("%02.0f") replace
+generate cty=county
+	tostring cty, format("%04.0f") replace
+generate ed=enumdist
+	tostring ed, format("%04.0f") replace
+*egen stcountyed = concat(st cty ed), format("%10.0f")
+*destring stcountyed, replace
+
+* labels 
+label define qagel 17 "non_va" 18 "va"
+label define cenhispl 0 "non_hisp" 1 "hisp"
+label define racel  1 "white" 2 "black" 3 "aian" 4 "chinese" 5 "japanese" 6 "other_asian"
+
+label values qage qagel
+label values cenhisp cenhispl
+label values race racel
+
+* keep only person records
+keep if rectype == "P"
+
+* crosstab 
+contract st cty ed qage cenhisp cenrace
+
+* save out cross tab to CSV file
+*export delimited using "Z:\ipums\misc\census-das\das_dp_data\crosstabs\ipums_orig.csv, replace
+export delimited using /pkg/ipums/misc/census-das/das_dp_data/crosstabs/ipums_orig.csv, replace	
+ 
+clear
+

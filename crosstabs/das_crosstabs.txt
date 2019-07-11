@@ -1,0 +1,18 @@
+set more off
+
+foreach x in 025 050 075 10 20 40 60 80 {
+foreach y in 1 2 3 4 {
+******************************
+*USA_PER_`x'_RUN1
+******************************
+
+use state county enumdist qage cenhisp cenrace using /pkg/ipums/misc/census-das/das_dp_data/stata/EXT1940USCB-EPSILON`x'-RUN`y'.zip_per.dta
+
+	contract state county enumdist qage cenhisp cenrace
+
+export delimited using /pkg/ipums/misc/census-das/das_dp_data/crosstabs/EXT1940USCB-EPSILON`x'-RUN`y'_per.csv, replace	
+
+clear
+
+}
+}
