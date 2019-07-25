@@ -2,9 +2,13 @@
 # Handles full nationwide data files from Census DAS
 # Factorizes some of the PER variables
 # Writes out a Stata file for each PER and UNIT file
+# 
+# 2019-07-25 
+# changed the write.dta to write_dta (function from haven package) because write_dta
+# supports later versions of Stata 
 
 library(tidyverse)
-library(foreign)
+library(haven)
 
 # set working directory to location of Census DAS output data
 setwd("/pkg/ipums/misc/census-das/das_dp_data/raw_census_das_output/")
@@ -79,7 +83,7 @@ for(i in looping_files){
   das$cenrace <- factor(das$cenrace, labels=c("white", "black", "aian", "chinese", "japanese", "other_asian"))
   
   # write out person file to DTA
-  write.dta(das, paste0(output_stata_path,i,per_out_file))
+  write_dta(das, paste0(output_stata_path,i,per_out_file))
   
   # remove DAS tbl 
   rm(das)
@@ -90,7 +94,7 @@ for(i in looping_files){
   das <- read_delim("MDF_UNIT.txt", delim = column_delimiter, col_names = unit_column_names, col_types = unit_column_types, skip = 14)
   
   #write out unit file to DTA
-  write.dta(das, paste0(output_stata_path,i,unit_out_file))
+  write_dta(das, paste0(output_stata_path,i,unit_out_file))
   
   #remove das df
   rm(das)
